@@ -4,7 +4,6 @@ import { DataSource, Repository } from 'typeorm';
 import { Order, OrderItem } from './order.entity.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { Product } from '../products/product.entity.js';
-import { UndefinedModuleEntryException } from '@nestjs/core/errors/exceptions/undefined-module-entry.exception.js';
 
 @Injectable()
 export class OrdersService {
@@ -16,9 +15,6 @@ export class OrdersService {
     ){}
 
     async create(dto: CreateOrderDto, userId: number): Promise<Order>{
-
-
-
         return this.dataSource.transaction(async (manager) => {
             const order = manager.create(Order, {userId, status: 'OPEN', items: []})
 
@@ -40,5 +36,28 @@ export class OrdersService {
 
             return manager.save(order);
         });
+    }
+
+    async findAll() {
+        return this.orderRepository.find({order: {id: 'DESC'}});
+    }
+
+    async findOne(id:number){
+        const order = await this.orderRepository.findOne({where: {id: id}})
+        if (!order) throw new NotFoundException(`Ordem de número ${id} não encontrada.`)
+        return order
+    }
+
+    async cancel(id:number){
+        return this.dataSource.manager.transaction(async (manager) => {
+            const order = await manager.findOne(Order, {where: {id: id}})
+            if (!order) throw new NotFoundException(`Ordem de número ${id} não encontrada.`)
+            if (order.status != 'OPEN') throw new BadRequestException(`Apenas ordens em estado OPEN podem ser canceladas.`)
+            for (const item of order.items){
+                await manager.increment(Product, {id:item.productId}, 'stock', item.quantity)
+            }
+            order.status = 'CANCELLED'
+            return manager.save(order)
+        })
     }
 }
