@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
-import { ProductDto } from "./dto/product.dto.js"
 import { UpdateProductDto } from "./dto/update-product.dto.js"
 import { CreateProductDto } from "./dto/create-product.dto.js"
 import { ILike, Repository } from "typeorm"
@@ -55,5 +54,12 @@ export default class ProductService {
 
     async queryByName(query:string): Promise<Product[]> {
         return this.productRepository.find({ where: { name: ILike(`%${query}%`)}})
+    }
+
+    async updateImageFilename(id: number, filename: string) {
+        const product = await this.productRepository.findOne({where: {id: id}})
+        if (!product) throw new NotFoundException(`Produto com id ${id} não encontrado.`)
+        product.imageFilename = filename
+        return this.productRepository.save(product);
     }
 }
