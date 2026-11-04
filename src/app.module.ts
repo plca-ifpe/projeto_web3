@@ -18,7 +18,7 @@ import { CategoryModule } from './category/category.module.js';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get('DB_HOST'),
+        host: 'localhost',
         port: config.get('DB_PORT'),
         username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),

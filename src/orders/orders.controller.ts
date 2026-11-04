@@ -20,7 +20,6 @@ export class OrdersController {
     @ApiResponse({status: 401, description: "Não autenticado"})
     @ApiResponse({status: 404, description: "Endereço de id xpto não encontrado ou inexistente."})
     @ApiResponse({status: 404, description: "Produto xpto não encontrado."})
-    
     create(@Body() dto:CreateOrderDto, @Req() req: Request & {user : { id:number}}){
         return this.orderService.create(dto, req.user.id)
     }
@@ -29,8 +28,8 @@ export class OrdersController {
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Busca todos os pedidos de um usuário'})
     @ApiResponse({status: 200, description: "Sucesso na busca dos pedidos"})
-    findAll(@Req() req: Request & {user : { id:number}}){
-        return this.orderService.findAll(req.user.id)
+    findAll(@Req() req: Request & {user : { id:number, role: string}}){
+        return this.orderService.findAll(req.user.id, req.user.role)
     }
 
     @Get(':id')

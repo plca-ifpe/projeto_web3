@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Address } from './entities/address.entity.js';
 import { CreateAddressDto } from './dto/create-address.dto.js';
+import { User } from '../auth/user.entity.js';
 
 @Injectable()
 export class AddressesService {
@@ -11,10 +12,20 @@ export class AddressesService {
   constructor (
           @InjectRepository(Address)
           private readonly addressRepository: Repository<Address>,
+          @InjectRepository(User)
+          private readonly userRepository: Repository<User>,
       ){}
   
   async create(createAddress: CreateAddressDto, userId: number): Promise<Address>{
-      const address = this.addressRepository.create({...createAddress, user: {id: userId}})
+      const address = this.addressRepository.create(createAddress)
+      const user = await this.userRepository.findOne({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        throw new NotFoundException(`Usuário ${userId} não encontrado.`);
+      }
+      address.user = user
       return this.addressRepository.save(address)
   }
 
@@ -36,8 +47,8 @@ export class AddressesService {
         return address;
     }
 
-  async update(id: number, updateAddressDto: UpdateAddressDto) {
-        const address = await this.addressRepository.findOne({ where: {id } })
+  async update(id: number, updateAddressDto: UpdateAddressDto, userId: number) {
+        const address = await this.addressRepository.findOne({ where: {id: id, user: {id:userId}} })
         if(!address)
             throw new NotFoundException(`Endereço com ID ${id} não encontrado.`);
         Object.assign(address, updateAddressDto);

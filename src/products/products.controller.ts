@@ -38,7 +38,7 @@ export class ProductsController {
 
     @Put(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADMIN')
+    @Roles('ADMIN', 'MANAGER')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Atualiza dados de um produto (Apenas ADMINS)'})
     @ApiResponse({status: 200, description: "Sucesso na atualização do produto"})
@@ -57,7 +57,7 @@ export class ProductsController {
     @ApiOperation({ summary: 'Deleta um produto (Apenas ADMINS)'})
     @ApiResponse({status: 204, description: "Sucesso na remoção do produto"})
     @ApiResponse({status: 401, description: "Não autenticado"})
-    @ApiResponse({status: 403, description: "Não autorizado"})
+    @ApiResponse({status: 403, description: "Você não tem permissão para acessar esse serviço"})
     @ApiResponse({status: 404, description: "Produto não encontrado"})
     delete(@Param('id') id:number) : Promise<void> {
         return this.productService.delete(id)

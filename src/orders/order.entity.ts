@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import type { Relation } from "typeorm"
 import { Address } from "../addresses/entities/address.entity.js"
 import { IsInt } from "class-validator"
@@ -11,8 +11,8 @@ export class Order {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({ type: 'int'})
-    userId: number
+    // @Column({ type: 'int'})
+    // userId: number
 
     @Column({ type: 'varchar', length: 20, default: 'OPEN'})
     status: OrderStatus
@@ -23,10 +23,11 @@ export class Order {
     @OneToMany( () => OrderItem, (item) => item.order, {cascade: true, eager: true})
     items: OrderItem[]
 
-    @OneToOne( () => Address, (address) => address.orders)
+    @ManyToOne( () => Address, (address) => address.orders)
     address: Address;
 
     @ManyToOne( () => User, (user) => user.orders)
+    @JoinColumn({ name: 'userId'})
     client: Relation<User>;
 }
 
@@ -34,9 +35,6 @@ export class Order {
 export class OrderItem {
     @PrimaryGeneratedColumn()
     id: number
-
-    @IsInt()
-    clientId: number
 
     @Column()
     productId: number

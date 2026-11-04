@@ -3,7 +3,7 @@ import type { Relation } from "typeorm"
 import { Order } from "../orders/order.entity.js"
 import { Address } from "../addresses/entities/address.entity.js"
 
-export type Role = 'CLIENT' | 'ADMIN'
+export type Role = 'CLIENT' | 'ADMIN' | 'MANAGER'
 
 @Entity('users')
 export class User {
@@ -26,5 +26,5 @@ export class User {
     orders: Relation<Order[]>
 
     @OneToMany(() => Address, (address) => address.user)
-    addresses: Relation<Address>;
+    addresses: Relation<Address[]>;
 }

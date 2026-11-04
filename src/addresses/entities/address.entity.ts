@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, OneToMany, ManyToOne, Column } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { Order } from '../../orders/order.entity.js';
 import { IsString } from 'class-validator';
@@ -9,6 +9,7 @@ export class Address {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column()
     @IsString()
     address: string;
 
