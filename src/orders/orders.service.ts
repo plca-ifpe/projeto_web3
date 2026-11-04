@@ -19,7 +19,7 @@ export class OrdersService {
 
     async create(dto: CreateOrderDto, userId: number): Promise<Order>{
         return this.dataSource.transaction(async (manager) => {
-            const address = await this.AddressesService.findById(dto.addressId)
+            const address = await this.AddressesService.findById(dto.addressId, userId)
 
             if (!address) throw new NotFoundException(`Endereço de id ${dto.addressId} não encontrado ou inexistente.`)
             
@@ -45,21 +45,25 @@ export class OrdersService {
         });
     }
 
-    async findAll() {
-        return this.orderRepository.find({order: {id: 'DESC'}});
+    async findAll(userId: number) {
+        return this.orderRepository.find({
+        where: {
+            client: {id: userId}
+        },
+        order: {id: 'DESC'}});
     }
 
-    async findOne(id:number){
-        const order = await this.orderRepository.findOne({where: {id: id}})
+    async findOne(id:number, userId:number){
+        const order = await this.orderRepository.findOne({where: {id: id, client: {id: userId}}})
         if (!order) throw new NotFoundException(`Ordem de número ${id} não encontrada.`)
         return order
     }
 
-    async cancel(id:number){
+    async cancel(id:number, userId:number){
         return this.dataSource.manager.transaction(async (manager) => {
-            const order = await manager.findOne(Order, {where: {id: id}})
+            const order = await manager.findOne(Order, {where: {id: id, client: {id: userId}}})
             if (!order) throw new NotFoundException(`Ordem de número ${id} não encontrada.`)
-            if (order.status != 'OPEN') throw new BadRequestException(`Apenas ordens em estado OPEN podem ser canceladas.`)
+            if (order.status != 'OPEN') throw new BadRequestException(`Apenas pedidos em estado OPEN podem ser canceladas.`)
             for (const item of order.items){
                 await manager.increment(Product, {id:item.productId}, 'stock', item.quantity)
             }
@@ -68,9 +72,9 @@ export class OrdersService {
         })
     }
 
-    async pay(id:number) {
+    async pay(id:number, userId:number) {
         return this.dataSource.manager.transaction(async (manager) => {
-            const order = await manager.findOne(Order, {where: {id: id}})
+            const order = await manager.findOne(Order, {where: {id: id, client: {id: userId}}})
             if (!order) throw new NotFoundException(`Ordem de número ${id} não encontrada.`)
             if (order.status != 'OPEN') throw new BadRequestException(`Apenas ordens em estado OPEN podem ser pagas.`)
             order.status = 'PAID'

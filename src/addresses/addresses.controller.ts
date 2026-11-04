@@ -16,22 +16,24 @@ export class AddressesController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.addressesService.findAll();
+  findAll(@Req() req: Request & { user: {id:number}}) {
+    return this.addressesService.findAll(req.user.id);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  findById(@Param('id') id: string) {
-    return this.addressesService.findById(+id);
+  findById(@Param('id') id: string, @Req() req: Request & { user: {id:number}}) {
+    return this.addressesService.findById(+id, req.user.id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   patch(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
     return this.addressesService.update(+id, updateAddressDto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   delete(@Param('id') id: string) {
     return this.addressesService.remove(+id);
   }

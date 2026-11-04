@@ -18,12 +18,19 @@ export class AddressesService {
       return this.addressRepository.save(address)
   }
 
-  findAll(): Promise<Address[]> {
-    return this.addressRepository.find();
+  async findAll(userId: number): Promise<Address[]> {
+    return this.addressRepository.find({
+      where: {
+        user: {
+          id: userId
+        }
+      }
+    });
   }
 
-  async findById(id: number): Promise<Address> {
-        let address = await this.addressRepository.findOne({ where: { id } })
+  async findById(id: number, userId: number): Promise<Address> {
+        let address = await this.addressRepository.findOne(
+          { where: { id: id, user: {id: userId} } })
         if(!address)
             throw new NotFoundException(`Endereço com ID ${id} não encontrado.`);
         return address;
