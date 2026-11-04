@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { AddressesService } from './addresses.service.js';
 import { CreateAddressDto } from './dto/create-address.dto.js';
 import { UpdateAddressDto } from './dto/update-address.dto.js';
@@ -10,8 +10,8 @@ export class AddressesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createAddressDto: CreateAddressDto) {
-    return this.addressesService.create(createAddressDto);
+  create(@Body() createAddressDto: CreateAddressDto, @Req() req: Request & {user : { id:number}}) {
+    return this.addressesService.create(createAddressDto, req.user.id);
   }
 
   @Get()

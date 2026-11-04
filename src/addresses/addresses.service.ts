@@ -13,9 +13,9 @@ export class AddressesService {
           private readonly addressRepository: Repository<Address>,
       ){}
   
-  async create(createAddress: CreateAddressDto): Promise<Address>{
-      const product = this.addressRepository.create(createAddress)
-      return this.addressRepository.save(product)
+  async create(createAddress: CreateAddressDto, userId: number): Promise<Address>{
+      const address = this.addressRepository.create({...createAddress, user: {id: userId}})
+      return this.addressRepository.save(address)
   }
 
   findAll(): Promise<Address[]> {
@@ -29,11 +29,17 @@ export class AddressesService {
         return address;
     }
 
-  update(id: number, updateAddressDto: UpdateAddressDto) {
-    return `This action updates a #${id} address`;
+  async update(id: number, updateAddressDto: UpdateAddressDto) {
+        const address = await this.addressRepository.findOne({ where: {id } })
+        if(!address)
+            throw new NotFoundException(`Endereço com ID ${id} não encontrado.`);
+        Object.assign(address, updateAddressDto);
+        return this.addressRepository.save(address);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} address`;
+  async remove(id: number) {
+    const result = await this.addressRepository.delete(id);
+
+    if (!result.affected) throw new NotFoundException(`Endereço com ID ${id} não encontrado.`);
   }
 }

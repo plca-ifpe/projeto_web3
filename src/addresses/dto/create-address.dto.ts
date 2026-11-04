@@ -1,5 +1,4 @@
-import { IsInt, IsString, MinLength } from "class-validator"
-import { PrimaryGeneratedColumn } from "typeorm"
+import { IsString, MinLength } from "class-validator"
 
 export class CreateAddressDto {
     @IsString()
