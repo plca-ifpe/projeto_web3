@@ -4,6 +4,8 @@ import { DataSource, Repository } from 'typeorm';
 import { Order, OrderItem } from './order.entity.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { Product } from '../products/product.entity.js';
+import { Address } from '../addresses/entities/address.entity.js';
+import { AddressesService } from '../addresses/addresses.service.js';
 
 @Injectable()
 export class OrdersService {
@@ -11,11 +13,16 @@ export class OrdersService {
     constructor (
         @InjectRepository(Order)
         private readonly orderRepository: Repository<Order>,
+        private readonly AddressesService: AddressesService,
         private readonly dataSource: DataSource
     ){}
 
     async create(dto: CreateOrderDto, userId: number): Promise<Order>{
         return this.dataSource.transaction(async (manager) => {
+            const address = await this.AddressesService.findById(dto.addressId)
+
+            if (!address) throw new NotFoundException(`Endereço de id ${dto.addressId} não encontrado ou inexistente.`)
+            
             const order = manager.create(Order, {userId, status: 'OPEN', items: []})
 
             for (const itemDto of dto.items) {

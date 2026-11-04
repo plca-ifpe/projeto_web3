@@ -1,5 +1,8 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import type { Relation } from "typeorm"
 import { Address } from "../addresses/entities/address.entity.js"
+import { IsInt } from "class-validator"
+import { User } from "../auth/user.entity.js"
 
 export type OrderStatus = 'OPEN' | 'PAID' | 'CANCELLED'
 
@@ -22,12 +25,18 @@ export class Order {
 
     @OneToOne( () => Address, (address) => address.orders)
     address: Address;
+
+    @ManyToOne( () => User, (user) => user.orders)
+    client: Relation<User>;
 }
 
 @Entity('order_items')
 export class OrderItem {
     @PrimaryGeneratedColumn()
     id: number
+
+    @IsInt()
+    clientId: number
 
     @Column()
     productId: number

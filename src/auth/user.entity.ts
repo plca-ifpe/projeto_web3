@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import type { Relation } from "typeorm"
+import { Order } from "../orders/order.entity.js"
 
 export type Role = 'CLIENT' | 'ADMIN'
 
@@ -18,4 +20,7 @@ export class User {
 
     @Column({default: 'CLIENT'})
     role: Role
+
+    @OneToMany(() => Order, (order) => order.client)
+    orders: Relation<Order[]>
 }

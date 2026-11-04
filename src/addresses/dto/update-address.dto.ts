@@ -1,4 +1,14 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateAddressDto } from './create-address.dto.js';
+import { IsInt, IsString, MinLength } from "class-validator"
+import { PrimaryGeneratedColumn } from "typeorm"
 
-export class UpdateAddressDto extends PartialType(CreateAddressDto) {}
+export class UpdateAddressDto {
+    @PrimaryGeneratedColumn()
+    addressId: number;
+
+    @IsString()
+    @MinLength(10)
+    address: string;
+
+    @IsInt()
+    orderId: number;
+}

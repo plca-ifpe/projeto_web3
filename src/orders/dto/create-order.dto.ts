@@ -19,4 +19,7 @@ export class CreateOrderDto {
     @ValidateNested({each: true})
     @Type( () => OrderItemInput)
     items: OrderItemInput[]
+
+    @IsInt()
+    addressId: number;
 }

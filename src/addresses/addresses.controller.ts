@@ -22,17 +22,17 @@ export class AddressesController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string) {
-    return this.addressesService.findOne(+id);
+  findById(@Param('id') id: string) {
+    return this.addressesService.findById(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
+  patch(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
     return this.addressesService.update(+id, updateAddressDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  delete(@Param('id') id: string) {
     return this.addressesService.remove(+id);
   }
 }
