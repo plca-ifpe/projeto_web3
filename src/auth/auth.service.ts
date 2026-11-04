@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, Req, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity.js';
@@ -33,6 +33,23 @@ export class AuthService {
         const payload = {sub: user.id, username: user.username, role: user.role}
         return {
             access_token: await this.jwtService.signAsync(payload)
+        }
+    }
+
+    async me(userId: number) {
+        const user = await this.userRepository.findOne({
+        where: { id: userId}
+        });
+
+        if (!user) {
+        throw new NotFoundException(`Usuário ${userId} não encontrado.`);
+        }
+
+        return {
+            userId: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role
         }
     }
 }

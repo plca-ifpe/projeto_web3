@@ -51,7 +51,7 @@ export class OrdersController {
         return this.orderService.cancel(id, req.user.id)
     }
 
-    @Post('id/paid')
+    @Post(':id/paid')
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Paga um pedido de um usuário'})
     @ApiResponse({status: 201, description: "Sucesso no pagamento do pedido"})
