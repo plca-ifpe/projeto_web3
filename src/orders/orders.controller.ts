@@ -28,4 +28,9 @@ export class OrdersController {
     cancel( @Param('id', ParseIntPipe) id: number){
         return this.orderService.cancel(id)
     }
+
+    @Post('id/paid')
+    pay( @Param('id', ParseIntPipe) id: number){
+        return this.orderService.pay(id)
+    }
 }

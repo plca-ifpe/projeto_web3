@@ -1,4 +1,3 @@
-import { PrimaryGeneratedColumn } from "typeorm"
 import { Order } from "./order.entity.js"
 
 export class OrderItem {

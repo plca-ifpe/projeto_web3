@@ -60,4 +60,14 @@ export class OrdersService {
             return manager.save(order)
         })
     }
+
+    async pay(id:number) {
+        return this.dataSource.manager.transaction(async (manager) => {
+            const order = await manager.findOne(Order, {where: {id: id}})
+            if (!order) throw new NotFoundException(`Ordem de número ${id} não encontrada.`)
+            if (order.status != 'OPEN') throw new BadRequestException(`Apenas ordens em estado OPEN podem ser pagas.`)
+            order.status = 'PAID'
+            return manager.save(order)
+        })
+    }
 }

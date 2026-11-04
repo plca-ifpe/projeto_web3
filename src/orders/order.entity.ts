@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
-import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata.js"
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Address } from "../addresses/entities/address.entity.js"
 
 export type OrderStatus = 'OPEN' | 'PAID' | 'CANCELLED'
 
@@ -19,6 +19,9 @@ export class Order {
 
     @OneToMany( () => OrderItem, (item) => item.order, {cascade: true, eager: true})
     items: OrderItem[]
+
+    @OneToOne( () => Address, (address) => address.orders)
+    address: Address;
 }
 
 @Entity('order_items')

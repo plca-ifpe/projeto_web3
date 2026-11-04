@@ -7,7 +7,7 @@ import { PatchProductDto } from './dto/patch-product.dto.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { Roles } from '../auth/roles.decorator.js';
 import { RolesGuard } from '../auth/roles.guard.js';
-import { ApiBearerAuth, ApiOperation, ApiResetContentResponse, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -20,6 +20,8 @@ export class ProductsController {
     constructor( private readonly productService: ProductService) {}
 
     @Get()
+    @ApiOperation({ summary: 'Busca todos os produtos'})
+    @ApiResponse({status: 200, description: "Sucesso na busca dos produtos"})
     findAll(@Query('q') query?: string): Promise<ProductDto[]> {
         if (query)
             return this.productService.queryByName(query)
@@ -27,6 +29,9 @@ export class ProductsController {
     }
 
     @Get(':id')
+    @ApiOperation({ summary: 'Busca dados de um produto'})
+    @ApiResponse({status: 200, description: "Sucesso na busca do produto"})
+    @ApiResponse({status: 404, description: "Produto não encontrado"})
     findById(@Param('id') id: number): Promise<ProductDto> {
         return this.productService.findById(id);
     }
@@ -34,6 +39,12 @@ export class ProductsController {
     @Put(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Atualiza dados de um produto (Apenas ADMINS)'})
+    @ApiResponse({status: 200, description: "Sucesso na atualização do produto"})
+    @ApiResponse({status: 401, description: "Não autenticado"})
+    @ApiResponse({status: 403, description: "Não autorizado"})
+    @ApiResponse({status: 404, description: "Produto não encontrado"})
     update(@Param('id') id:number, @Body() updatedProduct: UpdateProductDto): Promise<ProductDto> {
         return this.productService.update(id, updatedProduct);
     }
@@ -42,6 +53,12 @@ export class ProductsController {
     @HttpCode(204)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Deleta um produto (Apenas ADMINS)'})
+    @ApiResponse({status: 204, description: "Sucesso na remoção do produto"})
+    @ApiResponse({status: 401, description: "Não autenticado"})
+    @ApiResponse({status: 403, description: "Não autorizado"})
+    @ApiResponse({status: 404, description: "Produto não encontrado"})
     delete(@Param('id') id:number) : Promise<void> {
         return this.productService.delete(id)
     }
@@ -61,6 +78,12 @@ export class ProductsController {
     @Patch(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Atualiza dados de um produto, porém aceita JSON parcial (Apenas ADMINS)'})
+    @ApiResponse({status: 200, description: "Sucesso na atualização do produto"})
+    @ApiResponse({status: 401, description: "Não autenticado"})
+    @ApiResponse({status: 403, description: "Não autorizado"})
+    @ApiResponse({status: 404, description: "Produto não encontrado"})
     patch(
     @Param('id') id: string,
     @Body() dto: PatchProductDto,
@@ -71,6 +94,12 @@ export class ProductsController {
     @Post(':id/image')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADMIN')
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Atualiza dados de um produto com uma imagem (Apenas ADMINS)'})
+    @ApiResponse({status: 200, description: "Sucesso na atualização do produto"})
+    @ApiResponse({status: 401, description: "Não autenticado"})
+    @ApiResponse({status: 403, description: "Não autorizado"})
+    @ApiResponse({status: 404, description: "Produto não encontrado"})
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
@@ -98,6 +127,9 @@ export class ProductsController {
     }
 
     @Get(':id/image')
+    @ApiOperation({ summary: 'Busca a imagem de um produto (Apenas ADMINS)'})
+    @ApiResponse({status: 200, description: "Sucesso na busca da imagem"})
+    @ApiResponse({status: 404, description: "Produto não encontrado"})
     async getImage(
         @Param('id', ParseIntPipe) id:number,
         @Res() res: Response
